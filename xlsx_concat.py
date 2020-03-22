@@ -14,19 +14,17 @@ def help():
 		['xls转化合并','xlsx_con','//']],
 		columns=['名称','调用','库'])
 	print(help_o)
-    
+
+
 def Trans(path):
-	'''
-	import win32com.client as win32
-	import os 
-	'''
-#1	创建Transfrom-xlsx文件夹	
+	#格式转化
+	#1	创建Transfrom-xlsx文件夹	
 	path_new=path+'\\Trans'
 	if os.path.exists(path_new):
 		pass
 	else:
 		os.mkdir(path_new)
-#2	获取xls、csv、xlsx文件名列表
+	#2	获取xls、csv、xlsx文件名列表
 	print('工作目录',path)
 	spl_list=['.xls','.csv','.xlsx']
 	filelist = []
@@ -38,7 +36,7 @@ def Trans(path):
 	print('需要转化 %d 个文档:'%(aa))
 	print('文件列表',filelist)
 	print('转化中......')
-#3	转化格式为xlsx，并保存到Transfrom_xlsx
+	#3	转化格式为xlsx，并保存到Transfrom_xlsx
 	excel = win32.gencache.EnsureDispatch('Excel.Application')
 	for filelist_new in filelist:
 		fff=path+'\\'+filelist_new
@@ -48,13 +46,10 @@ def Trans(path):
 	excel.Application.Quit()
 	print('转化结束')	
 
+
 def xlsx_concat(path_new):
-	'''
-	import pandas as pd
-	import os 
-	import xlrd
-	'''
-#1	获取xlsx文件名称列表
+	#合并
+	#1	获取xlsx文件名称列表
 	print('合并目录',path_new)
 	filelist = []
 	spl_list=['.xlsx']
@@ -66,7 +61,7 @@ def xlsx_concat(path_new):
 	print('需合并 %d 个文档:'%(aa))
 	print('文件列表',filelist)
 	print('合并中......')
-#2	获取表及sheet名称列表	
+	#2	获取表及sheet名称列表	
 	Sheetlist=[]
 	datalist = []
 	for num_file in range(aa):
@@ -74,7 +69,7 @@ def xlsx_concat(path_new):
 		wb =xlrd.open_workbook(file_n)
 		sheet_name_1= wb.sheet_names()
 		sheetsum= len(sheet_name_1)
-#3	将excel数据以Datafram装入datalist列表
+	#3	将excel数据以Datafram装入datalist列表
 		for sheet_new in sheet_name_1:
 			datalist.append(pd.read_excel(file_n,sheet_name=sheet_new))
 			data_last=datalist[-1]
@@ -82,13 +77,14 @@ def xlsx_concat(path_new):
 			col_name.insert(0,'来源')
 			data_last=data_last.reindex(columns=col_name)
 			data_last['来源'] = str(filelist[num_file])+'@'+str(sheet_new)
-#4	将datalist的所有DataFrame按列合并
+	#4	将datalist的所有DataFrame按列合并
 	data = pd.concat(datalist,axis=0,sort=False)
 	outwriter = path_new  + '/' + '@excel_output.xls'
 	data.to_excel(outwriter)
 	print('合并成功')
 	print('已输出到Trans/@excel_output.xls')
 	print(data.shape)
+
 
 def xlsx_con():
 	path=os.getcwd()
